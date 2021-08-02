@@ -28,18 +28,22 @@ def find_matches():
         string_found = False
         count += 1
         journal_path = (frozen_index_path + 'frozendb/' + bucket + '/rawdata/' + journal_fname)
-        print('Reading bucket ' + str(count) + ' of ' + str(len(bucket_list)) + ' in file ' + journal_path)
         print('Current matching bucket count is -> ' + str(len(matching_buckets)))
+        print('Reading bucket ' + str(count) + ' of ' + str(len(bucket_list)) + ' in file ' + journal_path)
         with open(journal_path, 'r') as input_file:
+            line_number = 0
             for line in input_file:
                 if string_found is False and search_string in line:
-                    matching_buckets.append(bucket)
+                    line_number += 1
                     string_found = True
+                    matching_buckets.append(bucket)
                 elif string_found is True:
+                    print('Matching string found on line -> ' + str(line_number))
                     break
+        print('')
     global deduped_buckets
     deduped_buckets = list(dict.fromkeys(matching_buckets))
-    print('Buckets found with matching string -> ' + str(len(deduped_buckets)))
+    print('Buckets found with matching string -> ' + str(len(deduped_buckets)) + "\n")
 
 
 # Move all of the eligible buckets
@@ -49,11 +53,14 @@ def move_buckets():
         count += 1
         src = (frozen_index_path + 'frozendb/' + bucket)
         dest = (dest_index + 'frozendb/' + bucket)
-        print('Moving bucket ' + str(count) + ' of ' + str(len(deduped_buckets)) + ' from ' + src + ' to ' + dest)
+        print('Moving bucket ' + str(count) + ' of ' + str(len(deduped_buckets)) + ' from ' + src + ' to ' + dest + "\n")
         copy_tree(src, dest)
         remove_tree(src)
 
 
 get_buckets()
+print('Done Getting Buckets' + "\n")
 find_matches()
+print('Done Finding Matches' + "\n")
 move_buckets()
+print('Done Moving Buckets' + "\n")
