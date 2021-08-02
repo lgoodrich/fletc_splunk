@@ -5,12 +5,12 @@ from distutils.dir_util import copy_tree
 from distutils.dir_util import remove_tree
 
 
-bucket_list = []                               # Need this empty list to start
-deduped_buckets = []                           # Need this empty list to start
-journal_fname = 'journal'                      # This should be whatever the current name of the journal files are
-frozen_index_path = './foo_index/'             # Don't forget the trailing slash
-dest_index = './bar_index/'                    # Don't forget the trailing slash
-search_string = 'source::WinEventLog:Security' # The unique string to be used to find buckets
+bucket_list = []                                   # Need this empty list to start
+deduped_buckets = []                               # Need this empty list to start
+journal_fname = 'journal'                          # This should be whatever the current name of the journal files are
+frozen_index_path = './foo_index/'                 # Don't forget the trailing slash
+dest_index = './bar_index/'                        # Don't forget the trailing slash
+search_string = 'source::WinEventLog:Security'     # The unique string to be used to find buckets
 
 
 # Build a list of all the current buckets in the frozen index, this way we know the number of buckets to iterate over
@@ -25,22 +25,26 @@ def find_matches():
     matching_buckets = []
     count = 0
     for bucket in bucket_list:
-        string_found = False
-        count += 1
-        journal_path = (frozen_index_path + 'frozendb/' + bucket + '/rawdata/' + journal_fname)
-        print('Current matching bucket count is -> ' + str(len(matching_buckets)))
-        print('Reading bucket ' + str(count) + ' of ' + str(len(bucket_list)) + ' in file ' + journal_path)
-        with open(journal_path, 'r') as input_file:
-            line_number = 0
-            for line in input_file:
-                if string_found is False and search_string in line:
-                    line_number += 1
-                    string_found = True
-                    matching_buckets.append(bucket)
-                elif string_found is True:
-                    print('Matching string found on line -> ' + str(line_number))
-                    break
-        print('')
+        try:
+            string_found = False
+            count += 1
+            journal_path = (frozen_index_path + 'frozendb/' + bucket + '/rawdata/' + journal_fname)
+            print('Current matching bucket count is -> ' + str(len(matching_buckets)))
+            print('Reading bucket ' + str(count) + ' of ' + str(len(bucket_list)) + ' in file ' + journal_path)
+            with open(journal_path, 'r') as input_file:
+                line_number = 0
+                for line in input_file:
+                    if string_found is False and search_string in line:
+                        line_number += 1
+                        string_found = True
+                        matching_buckets.append(bucket)
+                    elif string_found is True:
+                        print('Matching string found on line -> ' + str(line_number))
+                        break
+            print('')
+        except:
+            print('Issue with bucket in path -> ' + journal_path)
+            continue
     global deduped_buckets
     deduped_buckets = list(dict.fromkeys(matching_buckets))
     print('Buckets found with matching string -> ' + str(len(deduped_buckets)) + "\n")
