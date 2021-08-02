@@ -43,7 +43,7 @@ def find_matches():
                         break
             print('')
         except:
-            print('Issue with bucket in path -> ' + journal_path)
+            print('Issue with bucket -> ' + bucket + "\n")
             continue
     global deduped_buckets
     deduped_buckets = list(dict.fromkeys(matching_buckets))
