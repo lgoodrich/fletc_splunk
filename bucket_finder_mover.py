@@ -1,27 +1,73 @@
 #! /usr/bin/python
 
+""" Splunk frozen bucket find and move script
+
+A simple script to search through a given index (directory) where frozen data
+has been written that actually needs to be in separate indexes. This solution
+arises from a scenario where a splunk environment was improperly configured.
+That misconfiguration resulted in multiple indexes freezing buckets into a
+single directory. The assumption is that if you can find a string of text within
+the journal files, that is unique to events belonging to a single index, you can
+use this script to search all the journals, find all buckets that match, compile
+that list of directories, and then finally move them into the correct
+destination index.
+
+Consists of three primary functions...
+
+get_buckets  - Builds a list of all buckets in the index. Gives us a finite list 
+               to iterate over for searching.
+find_matches - Finds the first occurence of search_string as it iterates over
+               all buckets in bucket_list. This yields a list of buckets to be
+               moved.
+move_buckets - Copies found buckets into the destination directory. If
+               succesful, remove the source from the old path.
+"""
+
 import os
 from distutils.dir_util import copy_tree
 from distutils.dir_util import remove_tree
 
 
-bucket_list = []                                   # Need this empty list to start
-deduped_buckets = []                               # Need this empty list to start
-journal_fname = 'journal'                          # This should be whatever the current name of the journal files are
-source_index = './foo_index/'                      # Don't forget the trailing slash
-dest_index = './bar_index/'                        # Don't forget the trailing slash
-search_string = 'source::WinEventLog:Security'     # The unique string to be used to find buckets
+bucket_list = []                               # Need this empty list to start
+deduped_buckets = []                           # Need this empty list to start
+journal_fname = 'journal'                      # The name of your journal files
+source_index = './foo_index/'                  # Don't forget the trailing slash
+dest_index = './bar_index/'                    # Don't forget the trailing slash
+search_string = 'source::WinEventLog:Security' # Your unique search string
 
 
-# Build a list of all the current buckets in the frozen index, this way we know the number of buckets to iterate over
+
 def get_buckets():
+    """Builds a list of all buckets in the index.
+
+    Parameters
+    ----------
+    None
+
+    Returns
+    -------
+    bucket_list
+        A list of all of the buckets in the index (directory)
+    """
+
     global bucket_list
     bucket_list = os.listdir(source_index + 'frozendb/')
     print('Starting frozen bucket count -> ' + str(len(bucket_list)))
 
 
-# Find first occcurence of the string match, build new list of matching buckets, dedup the final list
 def find_matches():
+    """Finds all the buckets that have a matching string
+
+    Parameters
+    ----------
+    None
+
+    Returns
+    -------
+    deduped_buckets
+        A list of buckets containing files with matches to search_string
+    """
+
     count = 0
     matching_buckets = []
     for bucket in bucket_list:
@@ -50,8 +96,18 @@ def find_matches():
     print('Buckets found with matching string -> ' + str(len(deduped_buckets)) + "\n")
 
 
-# Move all of the eligible buckets
 def move_buckets():
+    """Copies and removes source buckets if copy is successful
+
+    Parameters
+    ----------
+    None
+
+    Returns
+    -------
+    None
+    """
+
     count = 0
     for bucket in deduped_buckets:
         count += 1
