@@ -12,7 +12,9 @@ use this script to search all the journals, find all buckets that match, compile
 that list of directories, and then finally move them into the correct
 destination index.
 
-Consists of three primary functions...
+Requires two libraries, os and distutils
+
+Main consists of three primary functions calls...
 
 get_buckets  - Builds a list of all buckets in the index. Gives us a finite list 
                to iterate over for searching.
@@ -34,7 +36,6 @@ journal_fname = 'journal'                      # The name of your journal files
 source_index = './foo_index/'                  # Don't forget the trailing slash
 dest_index = './bar_index/'                    # Don't forget the trailing slash
 search_string = 'source::WinEventLog:Security' # Your unique search string
-
 
 
 def get_buckets():
@@ -117,10 +118,13 @@ def move_buckets():
         copy_tree(src, dest)
         remove_tree(src)
 
+def main():
+    get_buckets()
+    print('Done Getting Buckets' + "\n")
+    find_matches()
+    print('Done Finding Matches' + "\n")
+    move_buckets()
+    print('Done Moving Buckets' + "\n")
 
-get_buckets()
-print('Done Getting Buckets' + "\n")
-find_matches()
-print('Done Finding Matches' + "\n")
-move_buckets()
-print('Done Moving Buckets' + "\n")
+if __name__ == "__main__":
+    main()
