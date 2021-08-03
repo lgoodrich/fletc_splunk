@@ -22,6 +22,7 @@ Main function consists of three primary functions calls:
 """
 
 import os
+import gzip
 import argparse
 from distutils.dir_util import copy_tree
 from distutils.dir_util import remove_tree
@@ -75,7 +76,7 @@ def find_matches():
             journal_path = (get_args.src_idx + 'frozendb/' + bucket + '/rawdata/' + get_args.journal_fname)
             print('Current matching bucket count is -> ' + str(len(matching_buckets)))
             print('Reading bucket ' + str(count) + ' of ' + str(len(get_buckets.bucket_list)) + ' in file ' + journal_path)
-            with open(journal_path, 'r') as input_file:
+            with gzip.open(journal_path, 'r') as input_file:
                 line_number = 0
                 for line in input_file:
                     if string_found is False and get_args.search_string in line:
