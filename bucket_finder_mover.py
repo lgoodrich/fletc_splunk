@@ -33,9 +33,6 @@ journal_fname = 'journal'                      # The name of your journal files
 
 
 def get_args():
-    """Get required arguments.
-    """
-
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawTextHelpFormatter)
     parser.add_argument(
         'src_idx',
@@ -59,17 +56,11 @@ def get_args():
 
 
 def get_buckets():
-    """Builds a list of all buckets in the index.
-    """
-
     get_buckets.bucket_list = os.listdir(get_args.src_idx + 'frozendb/')
     print('Starting frozen bucket count -> ' + str(len(get_buckets.bucket_list)))
 
 
 def find_matches():
-    """Finds all the buckets that have a matching string
-    """
-
     count = 0
     matching_buckets = []
     for bucket in get_buckets.bucket_list:
@@ -98,9 +89,6 @@ def find_matches():
 
 
 def move_buckets():
-    """Copies and removes source buckets if copy is successful
-    """
-
     count = 0
     for bucket in find_matches.deduped_buckets:
         count += 1
