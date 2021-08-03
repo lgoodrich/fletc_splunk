@@ -29,7 +29,6 @@ from distutils.dir_util import remove_tree
 
 bucket_list = []                               # Need this empty list to start
 deduped_buckets = []                           # Need this empty list to start
-journal_fname = 'journal'                      # The name of your journal files
 
 
 def get_args():
@@ -49,10 +48,16 @@ def get_args():
         type = str,
         help = "The text chars you want to search for in all journal files"
     )
+    parser.add_argument(
+        'journal_fname',
+        type = str,
+        help = "Filename of your journal files... should be journal.gz"
+    )
     args = parser.parse_args()
     get_args.src_idx = args.src_idx
     get_args.dest_idx = args.dest_idx
-    get_args.search_string = args.search_string 
+    get_args.search_string = args.search_string
+    get_args.journal_fname = args.journal_fname
 
 
 def get_buckets():
@@ -67,7 +72,7 @@ def find_matches():
         try:
             count += 1
             string_found = False
-            journal_path = (get_args.src_idx + 'frozendb/' + bucket + '/rawdata/' + journal_fname)
+            journal_path = (get_args.src_idx + 'frozendb/' + bucket + '/rawdata/' + get_args.journal_fname)
             print('Current matching bucket count is -> ' + str(len(matching_buckets)))
             print('Reading bucket ' + str(count) + ' of ' + str(len(get_buckets.bucket_list)) + ' in file ' + journal_path)
             with open(journal_path, 'r') as input_file:
@@ -97,6 +102,7 @@ def move_buckets():
         print('Moving bucket ' + str(count) + ' of ' + str(len(find_matches.deduped_buckets)) + ' from ' + src + ' to ' + dest + "\n")
         copy_tree(src, dest)
         remove_tree(src)
+
 
 def main():
     get_args()
