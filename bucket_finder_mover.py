@@ -28,10 +28,6 @@ from distutils.dir_util import copy_tree
 from distutils.dir_util import remove_tree
 
 
-bucket_list = []                               # Need this empty list to start
-deduped_buckets = []                           # Need this empty list to start
-
-
 def get_args():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawTextHelpFormatter)
     parser.add_argument(
@@ -68,6 +64,8 @@ def get_buckets():
 
 def find_matches():
     count = 0
+    bucket_list= []
+    deduped_buckets = []
     matching_buckets = []
     for bucket in get_buckets.bucket_list:
         try:
